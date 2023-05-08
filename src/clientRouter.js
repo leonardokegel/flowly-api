@@ -34,9 +34,12 @@ secRouter.post("/register", express.json(), (req, res) => {
             email: req.body.email,
             senha: bcrypt.hashSync(req.body.senha, 8),
             nome: req.body.nome,
-          })
-          .then(() => {
-            res.status(201).json();
+          }, ['email'])
+          .then((result) => {
+            let user = result[0];
+            res.status(200).json({
+              mensagem: `Usuario ${user.email} inserido com sucesso!`
+            });
           })
           .catch((err) => {
             console.log(err);
