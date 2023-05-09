@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken');
 const secRouter = express.Router();
 var config;
 const isLocal = process.env.ISLOCAL;
@@ -30,15 +31,18 @@ secRouter.post("/register", express.json(), (req, res) => {
     .then((user) => {
       if (user.length < 1) {
         knex("users")
-          .insert({
-            email: req.body.email,
-            senha: bcrypt.hashSync(req.body.senha, 8),
-            nome: req.body.nome,
-          }, ['email'])
+          .insert(
+            {
+              email: req.body.email,
+              senha: bcrypt.hashSync(req.body.senha, 8),
+              nome: req.body.nome,
+            },
+            ["email"]
+          )
           .then((result) => {
             let user = result[0];
             res.status(200).json({
-              mensagem: `Usuario ${user.email} inserido com sucesso!`
+              mensagem: `Usuario ${user.email} inserido com sucesso!`,
             });
           })
           .catch((err) => {
@@ -53,6 +57,39 @@ secRouter.post("/register", express.json(), (req, res) => {
           statusCode: 422,
         });
       }
+    });
+});
+
+secRouter.post("/login", express.json(), (req, res) => {
+  knex('users')
+    .where({
+      email: req.body.email,
+    }).first()
+    .then((user) => {
+      if (user) {
+        let checkSenha = bcrypt.compareSync(req.body.senha, user.senha);
+        if (checkSenha) {
+          var tokenJWT = jwt.sign({ id: user.id, email: user.email }, process.env.SECRET_KEY, {
+            expiresIn: 3600,
+          });
+          res.status(200).json({
+            id: user.id,
+            email: user.email,
+            nome: user.nome,
+            token: tokenJWT,
+          });
+        } else {
+          res.status(400).json({ message: "Login ou senha incorretos" });
+        }
+      } else {
+        res.status(400).json({ message: "Login ou senha incorretos" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: err,
+      });
     });
 });
 
