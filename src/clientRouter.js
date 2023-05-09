@@ -1,36 +1,37 @@
 require("dotenv").config();
 const express = require("express");
+const knex = require("./db/knex");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const jwt = require('jsonwebtoken');
+
 const secRouter = express.Router();
-var config;
-const isLocal = process.env.ISLOCAL;
-if (isLocal) {
-  config = {
-    client: "pg",
-    connection: {
-      connectionString: process.env.DATABASE_URL,
-    },
-  };
-} else {
-  config = {
-    client: "pg",
-    connection: {
-      connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    },
-  };
-}
-const knex = require("knex")(config);
+
+// const isLocal = process.env.ISLOCAL;
+// if (isLocal) {
+//   config = {
+//     client: "pg",
+//     connection: {
+//       connectionString: process.env.DATABASE_URL,
+//     },
+//   };
+// } else {
+//   config = {
+//     client: "pg",
+//     connection: {
+//       connectionString: process.env.DATABASE_URL,
+//       ssl: {
+//         rejectUnauthorized: false,
+//       },
+//     },
+//   };
+// }
 
 secRouter.post("/register", express.json(), (req, res) => {
-  knex("users")
+  knex("usuarios")
     .where({ email: req.body.email })
     .then((user) => {
       if (user.length < 1) {
-        knex("users")
+        knex("usuarios")
           .insert(
             {
               email: req.body.email,
@@ -61,17 +62,22 @@ secRouter.post("/register", express.json(), (req, res) => {
 });
 
 secRouter.post("/login", express.json(), (req, res) => {
-  knex('users')
+  knex("usuarios")
     .where({
       email: req.body.email,
-    }).first()
+    })
+    .first()
     .then((user) => {
       if (user) {
         let checkSenha = bcrypt.compareSync(req.body.senha, user.senha);
         if (checkSenha) {
-          var tokenJWT = jwt.sign({ id: user.id, email: user.email }, process.env.SECRET_KEY, {
-            expiresIn: 3600,
-          });
+          var tokenJWT = jwt.sign(
+            { id: user.id, email: user.email },
+            process.env.SECRET_KEY,
+            {
+              expiresIn: 3600,
+            }
+          );
           res.status(200).json({
             id: user.id,
             email: user.email,
@@ -79,16 +85,16 @@ secRouter.post("/login", express.json(), (req, res) => {
             token: tokenJWT,
           });
         } else {
-          res.status(400).json({ 
+          res.status(400).json({
             mensagem: "Login ou senha incorretos",
-            statusCode: 400
-           });
+            statusCode: 400,
+          });
         }
       } else {
-        res.status(400).json({ 
+        res.status(400).json({
           mensagem: "Login ou senha incorretos",
-          statusCode: 400
-         });
+          statusCode: 400,
+        });
       }
     })
     .catch((err) => {
@@ -102,8 +108,8 @@ secRouter.post("/login", express.json(), (req, res) => {
 secRouter.get("/", express.json(), (req, res) => {
   knex
     .select("*")
-    .from("users")
-    .then((users) => res.status(200).json(users))
+    .from("usuarios")
+    .then((usuarios) => res.status(200).json(usuarios))
     .catch((err) => {
       console.log(err);
       res.status(500).json({
