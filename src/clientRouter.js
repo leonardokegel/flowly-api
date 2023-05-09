@@ -79,15 +79,21 @@ secRouter.post("/login", express.json(), (req, res) => {
             token: tokenJWT,
           });
         } else {
-          res.status(400).json({ message: "Login ou senha incorretos" });
+          res.status(400).json({ 
+            mensagem: "Login ou senha incorretos",
+            statusCode: 400
+           });
         }
       } else {
-        res.status(400).json({ message: "Login ou senha incorretos" });
+        res.status(400).json({ 
+          mensagem: "Login ou senha incorretos",
+          statusCode: 400
+         });
       }
     })
     .catch((err) => {
       res.status(500).json({
-        message: "Internal Server Error",
+        mensagem: "Internal Server Error",
         error: err,
       });
     });
