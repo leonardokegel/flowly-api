@@ -1,6 +1,6 @@
 FROM node:10
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/server
 
 COPY package*.json ./
 
@@ -12,4 +12,4 @@ ENV APP_PORT 8080
 
 EXPOSE 8080
 
-CMD [ "node", "app.js" ]
+CMD [ "node", "server.js" ]
