@@ -13,7 +13,7 @@ RUN npm install
 # Copia o restante do código-fonte da aplicação para o diretório de trabalho
 COPY . .
 
-# Expõe a porta em que o servidor Express estará ouvindo (por exemplo, 3000)
+# Expõe a porta em que o servidor Express estará ouvindo
 EXPOSE 3000
 
 # Comando para iniciar o servidor Express
