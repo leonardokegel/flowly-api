@@ -1,15 +1,20 @@
-FROM node:10
+# Define a imagem base
+FROM node:14-alpine
 
-WORKDIR /usr/src/server
+# Define o diretório de trabalho dentro do contêiner
+WORKDIR /app
 
+# Copia o arquivo package.json e package-lock.json para o diretório de trabalho
 COPY package*.json ./
 
+# Instala as dependências do projeto
 RUN npm install
 
+# Copia o restante do código-fonte da aplicação para o diretório de trabalho
 COPY . .
 
-ENV APP_PORT 8080
+# Expõe a porta em que o servidor Express estará ouvindo (por exemplo, 3000)
+EXPOSE 3000
 
-EXPOSE 8080
-
-CMD [ "node", "server.js" ]
+# Comando para iniciar o servidor Express
+CMD ["npm", "start"]
