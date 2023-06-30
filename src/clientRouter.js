@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const secRouter = express.Router();
 var config;
 const isLocal = process.env.ISLOCAL;
-if (isLocal) {
+if (!isLocal) {
   config = {
     client: "pg",
     connection: {
