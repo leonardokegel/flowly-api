@@ -1,32 +1,12 @@
 require("dotenv").config();
 const express = require("express");
-const knex = require("./db/knex");
+const knex = require("../db/knex");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const secRouter = express.Router();
+const userRouter = express.Router();
 
-// const isLocal = process.env.ISLOCAL;
-// if (isLocal) {
-//   config = {
-//     client: "pg",
-//     connection: {
-//       connectionString: process.env.DATABASE_URL,
-//     },
-//   };
-// } else {
-//   config = {
-//     client: "pg",
-//     connection: {
-//       connectionString: process.env.DATABASE_URL,
-//       ssl: {
-//         rejectUnauthorized: false,
-//       },
-//     },
-//   };
-// }
-
-secRouter.post("/register", express.json(), (req, res) => {
+userRouter.post("/register", express.json(), (req, res) => {
   knex("usuarios")
     .where({ email: req.body.email })
     .then((user) => {
@@ -61,7 +41,7 @@ secRouter.post("/register", express.json(), (req, res) => {
     });
 });
 
-secRouter.post("/login", express.json(), (req, res) => {
+userRouter.post("/login", express.json(), (req, res) => {
   knex("usuarios")
     .where({
       email: req.body.email,
@@ -108,7 +88,7 @@ secRouter.post("/login", express.json(), (req, res) => {
     });
 });
 
-secRouter.get("/", express.json(), (req, res) => {
+userRouter.get("/", express.json(), (req, res) => {
   knex
     .select("*")
     .from("usuarios")
@@ -121,4 +101,4 @@ secRouter.get("/", express.json(), (req, res) => {
     });
 });
 
-module.exports = secRouter;
+module.exports = userRouter;
