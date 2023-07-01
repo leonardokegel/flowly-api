@@ -1,27 +1,37 @@
 require("dotenv").config();
 const express = require("express");
-const bcrypt = require("bcryptjs");
+const knex = require("./db/knex");
 const jwt = require("jsonwebtoken");
-const secRouter = express.Router();
-var config;
-config = {
-  client: "pg",
-  connection: {
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false,
-    },
-  },
-};
+const bcrypt = require("bcryptjs");
 
-const knex = require("knex")(config);
+const secRouter = express.Router();
+
+// const isLocal = process.env.ISLOCAL;
+// if (isLocal) {
+//   config = {
+//     client: "pg",
+//     connection: {
+//       connectionString: process.env.DATABASE_URL,
+//     },
+//   };
+// } else {
+//   config = {
+//     client: "pg",
+//     connection: {
+//       connectionString: process.env.DATABASE_URL,
+//       ssl: {
+//         rejectUnauthorized: false,
+//       },
+//     },
+//   };
+// }
 
 secRouter.post("/register", express.json(), (req, res) => {
-  knex("users")
+  knex("usuarios")
     .where({ email: req.body.email })
     .then((user) => {
       if (user.length < 1) {
-        knex("users")
+        knex("usuarios")
           .insert(
             {
               email: req.body.email,
@@ -52,10 +62,11 @@ secRouter.post("/register", express.json(), (req, res) => {
 });
 
 secRouter.post("/login", express.json(), (req, res) => {
-  knex("users")
+  knex("usuarios")
     .where({
       email: req.body.email,
     })
+
     .first()
     .then((user) => {
       if (user) {
@@ -63,7 +74,9 @@ secRouter.post("/login", express.json(), (req, res) => {
         if (checkSenha) {
           var tokenJWT = jwt.sign(
             { id: user.id, email: user.email },
+
             process.env.SECRET_KEY,
+
             {
               expiresIn: 3600,
             }
@@ -98,8 +111,8 @@ secRouter.post("/login", express.json(), (req, res) => {
 secRouter.get("/", express.json(), (req, res) => {
   knex
     .select("*")
-    .from("users")
-    .then((users) => res.status(200).json(users))
+    .from("usuarios")
+    .then((usuarios) => res.status(200).json(usuarios))
     .catch((err) => {
       console.log(err);
       res.status(500).json({
