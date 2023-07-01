@@ -66,6 +66,7 @@ secRouter.post("/login", express.json(), (req, res) => {
     .where({
       email: req.body.email,
     })
+
     .first()
     .then((user) => {
       if (user) {
@@ -73,7 +74,9 @@ secRouter.post("/login", express.json(), (req, res) => {
         if (checkSenha) {
           var tokenJWT = jwt.sign(
             { id: user.id, email: user.email },
+
             process.env.SECRET_KEY,
+
             {
               expiresIn: 3600,
             }
