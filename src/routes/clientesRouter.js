@@ -15,40 +15,32 @@ clientesRouter.get("/clientes", express.json(), (req, res) => {
     });
 });
 
-clientesRouter.get("/clientes/:client_id", express.json(), (req, res) => {
-  let client_id = +req.params.client_id;
-  knex("clientes")
+clientesRouter.get("/clientes/:id_usuario", express.json(), (req, res) => {
+  let id_usuario = +req.params.id_usuario;
+  knex
     .select(
-      "clientes.id",
+      "clientes.id as cliente_id",
       "clientes.empresa",
       "clientes.nome",
       "clientes.email",
-      "propostas.id as proposta_id",
-      "propostas.titulo",
-      "propostas.status"
+      knex.raw("json_agg(DISTINCT propostas.*) as propostas"),
+      knex.raw("json_agg(DISTINCT contratos.*) as contratos")
     )
+    .from("clientes")
     .leftJoin("propostas", "clientes.id", "propostas.clienteId")
-    .where("clientes.id", client_id)
-    .then((result) => {
-      console.log(result);
-      if (result.length > 0) {
-        const cliente = {
-          id: result[0].id,
-          empresa: result[0].empresa,
-          nome: result[0].nome,
-          email: result[0].email,
-          propostas: result[0].proposta_id
-            ? result.map((e) => ({
-                id: e.proposta_id,
-                titulo: e.titulo,
-                status: e.status,
-              }))
-            : [],
-        };
-        res.status(200).json(cliente);
-      } else {
-        res.status(200).json([]);
-      }
+    .leftJoin("contratos", "clientes.id", "contratos.clienteId")
+    .where("clientes.userId", id_usuario)
+    .groupBy("clientes.id")
+    .then((rows) => {
+      const clientes = rows.map((row) => ({
+        id: row.cliente_id,
+        empresa: row.empresa,
+        nome: row.nome,
+        email: row.email,
+        propostas: validaArray(row.propostas),
+        contratos: validaArray(row.contratos),
+      }));
+      res.status(200).json(clientes);
     })
     .catch((err) => {
       console.log(err);
@@ -80,5 +72,13 @@ clientesRouter.post("/clientes/:id_usuario", express.json(), (req, res) => {
       });
     });
 });
+
+function validaArray(array) {
+  const result = array.filter((prop) => prop?.id !== null);
+  if (result[0] === null) {
+    return [];
+  }
+  return result;
+}
 
 module.exports = clientesRouter;
