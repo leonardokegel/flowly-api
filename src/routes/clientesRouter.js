@@ -16,7 +16,40 @@ clientesRouter.get("/clientes", express.json(), (req, res) => {
 });
 
 clientesRouter.get("/clientes/:id_usuario", express.json(), (req, res) => {
+  let view = req.query.view;
   let id_usuario = +req.params.id_usuario;
+
+  if (view === "simples") {
+    consultaClienteSimples(res, id_usuario);
+  } else {
+    consultaClienteDetalhado(res, id_usuario);
+  }
+});
+
+clientesRouter.post("/clientes/:id_usuario", express.json(), (req, res) => {
+  let id_usuario = +req.params.id_usuario;
+  knex("clientes")
+    .insert(
+      {
+        userId: id_usuario,
+        empresa: req.body.empresa,
+        nome: req.body.nome,
+        email: req.body.email,
+      },
+      ["userId", "empresa", "nome", "email"]
+    )
+    .then((clientes) => {
+      res.status(200).json(clientes[0]);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        mensagem: "Internal Server Error!",
+      });
+    });
+});
+
+function consultaClienteDetalhado(res, id_usuario) {
   knex
     .select(
       "clientes.id as cliente_id",
@@ -48,30 +81,20 @@ clientesRouter.get("/clientes/:id_usuario", express.json(), (req, res) => {
         mensagem: "Internal Server Error!",
       });
     });
-});
+}
 
-clientesRouter.post("/clientes/:id_usuario", express.json(), (req, res) => {
-  let id_usuario = +req.params.id_usuario;
-  knex("clientes")
-    .insert(
-      {
-        userId: id_usuario,
-        empresa: req.body.empresa,
-        nome: req.body.nome,
-        email: req.body.email,
-      },
-      ["userId", "empresa", "nome", "email"]
-    )
-    .then((clientes) => {
-      res.status(200).json(clientes[0]);
-    })
-    .catch((err) => {
-      console.log(err);
+function consultaClienteSimples(res, id_usuario) {
+  knex
+    .select("*")
+    .from("clientes")
+    .where({ userId: id_usuario })
+    .then((clientes) => res.status(200).json(clientes))
+    .catch(() => {
       res.status(500).json({
         mensagem: "Internal Server Error!",
       });
     });
-});
+}
 
 function validaArray(array) {
   const result = array.filter((prop) => prop?.id !== null);
