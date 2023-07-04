@@ -22,7 +22,7 @@ contratosRouter.get("/contratos", express.json(), (req, res) => {
     res.status(400).json({
       mensagem: "Informe o(s) id(s) do cliente através do query params id",
       statusCode: 400,
-    })
+    });
   }
   knex("contratos")
     .select(
@@ -51,7 +51,6 @@ contratosRouter.get("/contratos", express.json(), (req, res) => {
       } else {
         res.status(200).json([]);
       }
-      
     })
     .catch((err) => {
       console.log(err);
@@ -82,5 +81,32 @@ contratosRouter.post("/contratos/:id_cliente", express.json(), (req, res) => {
       });
     });
 });
+
+contratosRouter.delete(
+  "/contratos/:id_contrato",
+  express.json(),
+  (req, res) => {
+    let id_contrato = +req.params.id_contrato;
+    knex("contratos")
+      .where({ id: id_contrato })
+      .del()
+      .then((contrato) => {
+        if (contrato >= 1) {
+          res.status(204).json();
+        } else {
+          res.status(404).json({
+            message: "contrato não encontrado!",
+            statusCode: 404,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          mensagem: "Internal Server Error!",
+        });
+      });
+  }
+);
 
 module.exports = contratosRouter;
