@@ -3,19 +3,6 @@ const express = require("express");
 const knex = require("../db/knex");
 const contratosRouter = express.Router();
 
-// contratosRouter.get("/contratos", express.json(), (req, res) => {
-//   knex
-//     .select("*")
-//     .from("contratos")
-//     .then((contratos) => res.status(200).json(contratos))
-//     .catch((err) => {
-//       console.log(err);
-//       res.status(500).json({
-//         mensagem: "Internal Server Error!",
-//       });
-//     });
-// });
-
 contratosRouter.get("/contratos", express.json(), (req, res) => {
   let idsClientes = req.query.id?.split(",").map((e) => +e);
   if (!idsClientes) {
