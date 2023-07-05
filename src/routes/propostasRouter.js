@@ -66,7 +66,7 @@ propostasRouter.delete(
   express.json(),
   (req, res) => {
     let id_proposta = +req.params.id_proposta;
-    knex("contratos")
+    knex("propostas")
       .where({ id: id_proposta })
       .del()
       .then((proposta) => {
