@@ -49,6 +49,20 @@ clientesRouter.post("/clientes/:id_usuario", express.json(), (req, res) => {
     });
 });
 
+clientesRouter.delete("/clientes/:id_cliente", express.json(), (req, res) => {
+  let id_cliente = +req.params.id_cliente;
+  deletarCliente(id_cliente)
+    .then(() => {
+      res.status(204).json();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        mensagem: "Internal Server Error!",
+      });
+    });
+});
+
 function consultaClienteDetalhado(res, id_usuario) {
   knex
     .select(
@@ -102,6 +116,30 @@ function validaArray(array) {
     return [];
   }
   return result;
+}
+
+/*
+  Estamos utilizando o knex.transaction para realizar várias operações dentro do banco..
+  Se todas as operações derem certo, a transação é confirmada, persistindo as alterações no bd..
+  Caso uma falhe, a transação é revertida, desfazendo as alterações feitas até aquele ponto.
+*/
+
+async function deletarCliente(clienteId) {
+  console.log('chamei')
+  try {
+    await knex.transaction(async (trx) => {
+      // Excluir as propostas associadas ao cliente
+      await trx("propostas").where("clienteId", clienteId).del();
+
+      // Excluir os contratos associados ao cliente
+      await trx("contratos").where("clienteId", clienteId).del();
+
+      // Excluir o cliente
+      await trx("clientes").where("id", clienteId).del();
+    });
+  } catch (error) {
+    throw error;
+  }
 }
 
 module.exports = clientesRouter;
