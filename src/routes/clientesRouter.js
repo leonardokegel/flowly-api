@@ -125,7 +125,6 @@ function validaArray(array) {
 */
 
 async function deletarCliente(clienteId) {
-  console.log('chamei')
   try {
     await knex.transaction(async (trx) => {
       // Excluir as propostas associadas ao cliente
