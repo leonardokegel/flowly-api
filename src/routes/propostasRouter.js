@@ -3,7 +3,6 @@ const express = require("express");
 const knex = require("../db/knex");
 const propostasRouter = express.Router();
 
-
 propostasRouter.get("/propostas", express.json(), (req, res) => {
   let idsClientes = req.query.id?.split(",").map((e) => +e);
   if (!idsClientes) {
@@ -51,13 +50,16 @@ propostasRouter.get("/propostas", express.json(), (req, res) => {
 propostasRouter.post("/propostas/:id_cliente", express.json(), (req, res) => {
   let id_cliente = +req.params.id_cliente;
   knex("propostas")
-    .insert({
+    .insert(
+      {
         clienteId: id_cliente,
         status: req.body.status,
-        titulo: req.body.titulo
-    }, ['clienteId', 'titulo', 'status'])
+        titulo: req.body.titulo,
+      },
+      ["clienteId", "titulo", "status"]
+    )
     .then((proposta) => {
-        res.status(200).json(proposta[0])
+      res.status(200).json(proposta[0]);
     });
 });
 
@@ -87,5 +89,27 @@ propostasRouter.delete(
       });
   }
 );
+
+propostasRouter.put("/propostas/:id_proposta", express.json(), (req, res) => {
+  let id_proposta = +req.params.id_proposta;
+  knex("propostas")
+    .where({ id: id_proposta })
+    .update(
+      {
+        titulo: req.body.titulo,
+        status: req.body.status,
+      },
+      ["titulo", "status"]
+    )
+    .then((proposta) => {
+      res.status(200).json(proposta[0]);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        mensagem: "Internal Server Error!",
+      });
+    });
+});
 
 module.exports = propostasRouter;
