@@ -96,4 +96,26 @@ contratosRouter.delete(
   }
 );
 
+contratosRouter.put("/contratos/:id_contrato", express.json(), (req, res) => {
+  let id_contrato = +req.params.id_contrato;
+  knex("contratos")
+    .where({ id: id_contrato })
+    .update(
+      {
+        titulo: req.body.titulo,
+        status: req.body.status,
+      },
+      ["titulo", "status"]
+    )
+    .then((contrato) => {
+      res.status(200).json(contrato[0]);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        mensagem: "Internal Server Error!",
+      });
+    });
+});
+
 module.exports = contratosRouter;
