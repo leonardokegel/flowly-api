@@ -63,6 +63,29 @@ clientesRouter.delete("/clientes/:id_cliente", express.json(), (req, res) => {
     });
 });
 
+clientesRouter.put("/clientes/:id_cliente", express.json(), (req, res) => {
+  let id_cliente = +req.params.id_cliente;
+  knex("clientes")
+    .where({ id: id_cliente })
+    .update(
+      {
+        empresa: req.body.empresa,
+        nome: req.body.nome,
+        email: req.body.email,
+      },
+      ["empresa", "nome", "email"]
+    )
+    .then((cliente) => {
+      res.status(200).json(cliente[0]);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        mensagem: "Internal Server Error!",
+      });
+    });
+});
+
 function consultaClienteDetalhado(res, id_usuario) {
   knex
     .select(
