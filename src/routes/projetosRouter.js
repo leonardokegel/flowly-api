@@ -18,6 +18,7 @@ projetosRouter.get("/projetos", express.json(), (req, res) => {
       "projetos.status",
       "projetos.data_inicio",
       "projetos.valor",
+      "projetos.descricao",
       "clientes.id AS cliente.id",
       "clientes.empresa AS cliente.empresa",
       "clientes.nome AS cliente.nome"
@@ -32,6 +33,7 @@ projetosRouter.get("/projetos", express.json(), (req, res) => {
           status: projeto.status,
           data_inicio: projeto.data_inicio,
           valor: projeto.valor,
+          descricao: projeto.descricao,
           cliente: {
             id: projeto["cliente.id"],
             empresa: projeto["cliente.empresa"],
@@ -61,8 +63,9 @@ projetosRouter.post("/projetos/:id_cliente", express.json(), (req, res) => {
         titulo: req.body.titulo,
         data_inicio: req.body.data_inicio,
         valor: req.body.valor,
+        descricao: req.body.descricao
       },
-      ["id", "clienteId", "titulo", "status", "data_inicio", "valor"]
+      ["id", "clienteId", "titulo", "status", "data_inicio", "valor", "descricao"]
     )
     .then((projetos) => {
       res.status(200).json(projetos[0]);
@@ -112,8 +115,9 @@ projetosRouter.put("/projetos/:id_projeto", express.json(), (req, res) => {
         titulo: req.body.titulo,
         data_inicio: req.body.data_inicio,
         valor: req.body.valor,
+        descricao: req.body.descricao
       },
-      ["id", "clienteId", "titulo", "status", "data_inicio", "valor"]
+      ["id", "clienteId", "titulo", "status", "data_inicio", "valor", "descricao"]
     )
     .then((projeto) => {
       res.status(200).json(projeto[0]);

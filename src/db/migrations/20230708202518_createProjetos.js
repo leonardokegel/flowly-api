@@ -10,6 +10,7 @@ exports.up = function (knex) {
       table.integer("status", 4).notNullable();
       table.string("data_inicio", 255).notNullable();
       table.string("valor", 255).notNullable();
+      table.string('descricao', 255).notNullable();
     });
   };
   
