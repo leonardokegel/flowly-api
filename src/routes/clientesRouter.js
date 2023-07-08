@@ -36,7 +36,7 @@ clientesRouter.post("/clientes/:id_usuario", express.json(), (req, res) => {
         nome: req.body.nome,
         email: req.body.email,
       },
-      ["userId", "empresa", "nome", "email"]
+      ["id", "userId", "empresa", "nome", "email"]
     )
     .then((clientes) => {
       res.status(200).json(clientes[0]);
