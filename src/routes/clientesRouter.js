@@ -156,6 +156,9 @@ async function deletarCliente(clienteId) {
       // Excluir os contratos associados ao cliente
       await trx("contratos").where("clienteId", clienteId).del();
 
+      // Excluir os projetos associados ao cliente
+      await trx("projetos").where("clienteId", clienteId).del();
+
       // Excluir o cliente
       await trx("clientes").where("id", clienteId).del();
     });
